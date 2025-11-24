@@ -15,7 +15,7 @@ bool keys[256] = { false };
 int windowWidth = 900, windowHeight = 600;
 bool warpMouse = false;
 
-// Atualiza vetor de direção
+//atualiza vetor de direção
 void updateCameraDirection() {
     float radYaw = yaw * M_PI / 180.0f;
     float radPitch = pitch * M_PI / 180.0f;
@@ -25,18 +25,8 @@ void updateCameraDirection() {
     dirZ = sin(radYaw) * cos(radPitch);
 }
 
-// Desenha cubo
-void drawCube() {
-    glColor3f(1.0, 0.5, 0.2);
-    glutSolidCube(1.0);
-}
 
 
-// =====================================================
-//  FUNÇÕES AUXILIARES DE CONSTRUÇÃO 3D
-// =====================================================
-
-// Desenha um paralelepípedo (cubo escalado)
 void drawBox(float w, float h, float d) {
     glPushMatrix();
     glScalef(w, h, d);
@@ -44,14 +34,12 @@ void drawBox(float w, float h, float d) {
     glPopMatrix();
 }
 
-// -----------------------------------------------------
-// 1) PAREDE
-// -----------------------------------------------------
-// wallLength = largura da parede (horizontal)
-// wallHeight = altura
-// thickness  = espessura
-// (x, y, z) = posição do centro da parede
-// rotY = rotação para posicionar a parede
+//parede
+//wallLength = largura da parede (horizontal)
+//wallHeight = altura
+//thickness  = espessura
+//(x, y, z) = posição do centro da parede
+//rotY = rotação para posicionar a parede
 void drawWall(float wallLength, float wallHeight, float thickness,
               float x, float y, float z, float rotY = 0.0f,
               float r=0.8f, float g=0.8f, float b=0.8f) {
@@ -64,9 +52,7 @@ void drawWall(float wallLength, float wallHeight, float thickness,
     glPopMatrix();
 }
 
-// -----------------------------------------------------
-// 2) JANELA (moldura)
-// -----------------------------------------------------
+
 void drawWindow(float width, float height, float frameThickness,
                 float x, float y, float z, float rotY = 0.0f,
                 float r=0.5f, float g=0.5f, float b=0.6f) {
@@ -77,22 +63,22 @@ void drawWindow(float width, float height, float frameThickness,
 
     glColor3f(r, g, b);
 
-    // Moldura horizontal superior
+    //moldura horizontal superior
     drawBox(width, frameThickness, frameThickness);
 
-    // Moldura horizontal inferior
+    //moldura horizontal inferior
     glPushMatrix();
     glTranslatef(0, -height + frameThickness, 0);
     drawBox(width, frameThickness, frameThickness);
     glPopMatrix();
 
-    // Lateral esquerda
+    //lateral esquerda
     glPushMatrix();
     glTranslatef(-width/2 + frameThickness/2, -height/2, 0);
     drawBox(frameThickness, height, frameThickness);
     glPopMatrix();
 
-    // Lateral direita
+    //lateral direita
     glPushMatrix();
     glTranslatef(width/2 - frameThickness/2, -height/2, 0);
     drawBox(frameThickness, height, frameThickness);
@@ -101,9 +87,7 @@ void drawWindow(float width, float height, float frameThickness,
     glPopMatrix();
 }
 
-// -----------------------------------------------------
-// 3) PILAR
-// -----------------------------------------------------
+
 void drawPillar(float size, float height,
                 float x, float y, float z,
                 float r=0.7f, float g=0.7f, float b=0.7f) {
@@ -115,9 +99,7 @@ void drawPillar(float size, float height,
     glPopMatrix();
 }
 
-// -----------------------------------------------------
-// 4) CHÃO / PISO
-// -----------------------------------------------------
+
 void drawFloor(float width, float depth,
                float x, float y, float z,
                float r=0.3f, float g=0.3f, float b=0.3f) {
@@ -131,7 +113,7 @@ void drawFloor(float width, float depth,
 
 
 
-// Processa teclas continuamente
+//teclado
 void processMovement() {
     float rightX = -dirZ;
     float rightZ = dirX;
@@ -163,24 +145,9 @@ void processMovement() {
 }
 
 void drawScene() {
-    // CHÃO
-    drawFloor(20, 20, 0, 0, 0);
-
-    // PAREDES DO QUARTO
-    drawWall(20, 3, 0.2,  0, 0, -10);
-    drawWall(20, 3, 0.2,  0, 0,  10);
-    drawWall(20, 3, 0.2, -10, 0, 0, 90);
-    drawWall(20, 3, 0.2,  10, 0, 0, 90);
-
-    // PILARES NOS CANTOS
-    drawPillar(0.5, 3, -10, 0, -10);
-    drawPillar(0.5, 3, -10, 0,  10);
-    drawPillar(0.5, 3,  10, 0, -10);
-    drawPillar(0.5, 3,  10, 0,  10);
-
-    // JANELA NA PAREDE
-    drawWindow(3.0f, 2.0f, 0.2f,
-               0, 1.5f, -10 + 0.15f, 0);
+    drawWall(15, 3, 0.2, 0, 0, -5);
+	drawPillar(0.3, 4, 3, 0, 2);
+	drawWindow(2, 1.5, 0.1, -2, 1.5, -5);
 }
 
 void display() {
@@ -213,7 +180,7 @@ void keyboardUp(unsigned char key, int x, int y) {
     keys[key] = false;
 }
 
-// Mouse para rotação FPS
+//mouse
 void passiveMotion(int x, int y) {
     if (warpMouse) {  
         warpMouse = false;
