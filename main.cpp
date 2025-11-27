@@ -233,13 +233,11 @@ void drawWindowFrame(float width, float height, float frameThickness,
     float innerH = height - 2.0f * frameThickness;
     if (innerW > 0.0f && innerH > 0.0f) {
         // desenha vidro levemente deslocado para frente (evita z-fighting)
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
         glPushMatrix();
         glTranslatef(0.0f, -height/2.0f, 0.001f);
-        // vidro azul claro semi-transparente
-        glColor4f(0.7f, 0.9f, 1.0f, 0.45f);
+
+        // Vidro opaco: azul claro
+        glColor3f(0.7f, 0.9f, 1.0f);
         glBegin(GL_QUADS);
             glVertex3f(-innerW/2.0f,  innerH/2.0f, 0.0f);
             glVertex3f( innerW/2.0f,  innerH/2.0f, 0.0f);
@@ -258,7 +256,6 @@ void drawWindowFrame(float width, float height, float frameThickness,
         glEnd();
 
         glPopMatrix();
-        glDisable(GL_BLEND);
     }
 
     glPopMatrix();
@@ -435,7 +432,7 @@ void drawPaths() {
     // vertical
     glPushMatrix();
     glTranslatef(0, 0, 0);
-    glScalef(8, 0.1, 100);
+    glScalef(8, 0.1, 107.5);
     glutSolidCube(1);
     glPopMatrix();
 }
@@ -494,7 +491,7 @@ void drawGrass() {
     glColor3f(0.1f, 0.7f, 0.2f);
     glPushMatrix();
     glTranslatef(0, -0.1f, 0);
-    glScalef(100, 0.1f, 100);
+    glScalef(100, 0.1f, 107.5);
     glutSolidCube(1);
     glPopMatrix();
 }
@@ -811,6 +808,19 @@ void drawFront() {
     drawClosedDoor(5,10,1,-90,15,-20.5,180);
 }
 
+void drawWindowsOnCorner(){
+
+    drawWindowFrame(15, 8, 0.5f, -195, 12.5, 11, 0);
+    drawWindowFrame(15, 8, 0.5f, -165, 12.5, 11, 0);
+    drawWindowFrame(15, 8, 0.5f, -195, 25, 11, 0);
+    drawWindowFrame(15, 8, 0.5f, -165, 25, 11, 0);
+
+    drawWindowFrame(15, 8, 0.5f, -211, 12.5, -2.5, 90);
+    drawWindowFrame(15, 8, 0.5f, -211, 12.5, -32.5, 90);
+    drawWindowFrame(15, 8, 0.5f, -211, 25, -2.5, 90);
+    drawWindowFrame(15, 8, 0.5f, -211, 25, -32.5, 90);
+}
+
 void drawScene() {
     drawFront();
     // Segunda chamada rotacionada em 90 graus em Y e deslocada
@@ -827,6 +837,24 @@ void drawScene() {
     // Transla��o aplicada ap�s a rota��o (ajusta no sistema local rotacionado)
     glTranslatef(0.0f, 0.0f, 430.0f);
     drawFront();
+    glPopMatrix();
+    
+
+    //Janelas Canto Esquerdo
+    drawWindowsOnCorner();
+
+    //Janelas Canto Direito
+    glPushMatrix();
+    glRotatef(90.0f, 0.0f, 1.0f, 0.0f);
+    glTranslatef(200.0f, 0.0f, 200.0f);
+    drawWindowsOnCorner();
+    glPopMatrix();
+
+    //Janelas Canto Traseiro
+    glPushMatrix();
+    glRotatef(180.0f, 0.0f, 1.0f, 0.0f);
+    glTranslatef(0.0f, 0.0f, 415.0f);
+    drawWindowsOnCorner();
     glPopMatrix();
 
 	//entrada
@@ -857,9 +885,18 @@ void drawScene() {
     //parede quina traseira exterior 2	
     drawBox(60,30,1,180,15,-425,1,1,0.85);
 
+
+    //parede quina direita interior 1
+    drawBox(1,15,45,195,22.5,-42.5,1,1,0.85);
+    //parede quina direita interior 2
+    drawBox(45,15,1,172.5,22.5,-20,1,1,0.85);
+
+    //parede quina direita interior 3
+    drawBox(20,15,1,160,22.5,-45,1,1,0.85);
+
+
     //parede fechamento traseira esquerda
     drawBox(1,30,60,-150,15,-395,1,1,0.85);
-
     //parede fechamento traseira meio 1
     drawBox(20,30,1,0,15,-425,1,1,0.85); 
     //parede fechamento traseira meio 2
@@ -1045,7 +1082,7 @@ void display() {
 
     drawScene();
     glPushMatrix();
-    glTranslatef(0, 0.2f, -205);
+    glTranslatef(0, 0.2f, -215);
     glScalef(3, 2.5, 2.8);
 	drawPlaza();
 	glPopMatrix();
