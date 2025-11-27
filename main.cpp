@@ -69,13 +69,13 @@ void updateCameraDirection() {
     dirZ = sin(radYaw) * cos(radPitch);
 }
 
-// Desenha um telhado em empena (duas águas)
-// Parâmetros:
+// Desenha um telhado em empena (duas ï¿½guas)
+// Parï¿½metros:
 // width: largura total do telhado (eixo X)
 // depth: comprimento do telhado (eixo Z)
-// height: altura do beiral até o ápice (elevação da cumeeira)
-// x,y,z: posição da base do telhado (y = topo das paredes onde o telhado se assenta)
-// rotY: rotação em torno do eixo Y (graus)
+// height: altura do beiral atï¿½ o ï¿½pice (elevaï¿½ï¿½o da cumeeira)
+// x,y,z: posiï¿½ï¿½o da base do telhado (y = topo das paredes onde o telhado se assenta)
+// rotY: rotaï¿½ï¿½o em torno do eixo Y (graus)
 // r,g,b: cor do telhado
 void drawRoof(float width, float depth, float height,
               float x = 0.0f, float y = 0.0f, float z = 0.0f,
@@ -88,7 +88,7 @@ void drawRoof(float width, float depth, float height,
     glTranslatef(x, y, z);
     glRotatef(rotY, 0.0f, 1.0f, 0.0f);
 
-    // Faces do telhado (duas águas)
+    // Faces do telhado (duas ï¿½guas)
     glColor3f(r, g, b);
 
     // Lateral esquerda (quad)
@@ -107,7 +107,7 @@ void drawRoof(float width, float depth, float height,
         glVertex3f(halfW, 0.0f, halfD);
     glEnd();
 
-    // Empenas frontais (triângulos)
+    // Empenas frontais (triï¿½ngulos)
     glBegin(GL_TRIANGLES);
         glVertex3f(-halfW, 0.0f, -halfD);
         glVertex3f(halfW, 0.0f, -halfD);
@@ -180,10 +180,10 @@ void drawBox(float w, float h, float d,
     glScalef(w, h, d);
     
     // 4. Desenho
-    // Desenha sólido
+    // Desenha sï¿½lido
     glutSolidCube(1.0f);
 
-    // Desenha arestas em preto por cima do sólido (use wireframe para evitar diagonais)
+    // Desenha arestas em preto por cima do sï¿½lido (use wireframe para evitar diagonais)
     glColor3f(0.0f, 0.0f, 0.0f);
     glLineWidth(1.5f);
     glutWireCube(1.0f);
@@ -191,11 +191,11 @@ void drawBox(float w, float h, float d,
     glPopMatrix();
 }
 
-// Desenha só a moldura da janela (sem vidro).
+// Desenha sï¿½ a moldura da janela (sem vidro).
 // width: largura total (x), height: altura total (y), frameThickness: espessura da moldura
-// x,y,z: posição do topo central da janela
-// rotY: rotação em Y
-// r,g,b: cor da moldura (padrão marrom)
+// x,y,z: posiï¿½ï¿½o do topo central da janela
+// rotY: rotaï¿½ï¿½o em Y
+// r,g,b: cor da moldura (padrï¿½o marrom)
 void drawWindowFrame(float width, float height, float frameThickness,
                      float x, float y, float z, float rotY = 0.0f,
                      float r=0.55f, float g=0.27f, float b=0.07f) {
@@ -308,7 +308,7 @@ void drawClosedDoor(float w, float h, float thickness,
     // Pequeno cubo deslocado para a direita e um pouco pra frente
     glPushMatrix();
     glTranslatef(w/2.5f, 0.0f, thickness/1.5f); // Posi??o relativa ao centro da porta
-    // Maçaneta dourada
+    // Maï¿½aneta dourada
     drawBox(0.1f, 0.1f, 0.1f, 0.0f, 0.0f, 0.0f, 1.0f, 0.8f, 0.0f);
     glPopMatrix();
     glPopMatrix();
@@ -322,9 +322,9 @@ void drawFloor(float width, float depth,
     glTranslatef(x, y, z);
 
     // Chama o drawBox atualizado
-    // Parâmetros: 
+    // Parï¿½metros: 
     // width (largura), 0.1f (espessura fina), depth (profundidade)
-    // tx, ty, tz: translação (colocados em 0.0f)
+    // tx, ty, tz: translaï¿½ï¿½o (colocados em 0.0f)
     // r, g, b (cores)
     drawBox(width, 0.1f, depth, 0.0f, 0.0f, 0.0f, r, g, b);
 
@@ -375,16 +375,16 @@ void drawChair(float x, float y, float z, float scale, float rotY = 0.0f) {
     float r = 0.55f, g = 0.27f, b = 0.07f;
 
     // --- PERNAS (0.1 largura, 0.4 altura) ---
-    // Nota: O Y é 0.2 porque o drawBox desenha a partir do centro, 
-    // então para uma perna de altura 0.4 tocar o chão (0.0), o centro deve ser 0.2
+    // Nota: O Y ï¿½ 0.2 porque o drawBox desenha a partir do centro, 
+    // entï¿½o para uma perna de altura 0.4 tocar o chï¿½o (0.0), o centro deve ser 0.2
 
     // Perna Frente Esquerda
     drawBox(0.1f, 0.4f, 0.1f, -0.2f, 0.2f, 0.2f, r, g, b);
     // Perna Frente Direita
     drawBox(0.1f, 0.4f, 0.1f, 0.2f, 0.2f, 0.2f, r, g, b);
-    // Perna Trás Esquerda
+    // Perna Trï¿½s Esquerda
     drawBox(0.1f, 0.4f, 0.1f, -0.2f, 0.2f, -0.2f, r, g, b);
-    // Perna Trás Direita
+    // Perna Trï¿½s Direita
     drawBox(0.1f, 0.4f, 0.1f, 0.2f, 0.2f, -0.2f, r, g, b);
 
     // --- ASSENTO ---
@@ -393,11 +393,11 @@ void drawChair(float x, float y, float z, float scale, float rotY = 0.0f) {
     drawBox(0.5f, 0.05f, 0.5f, 0.0f, 0.425f, 0.0f, r, g, b);
 
     // --- ENCOSTO ---
-    // Pilares do encosto (extensão das pernas traseiras)
+    // Pilares do encosto (extensï¿½o das pernas traseiras)
     drawBox(0.1f, 0.5f, 0.05f, -0.2f, 0.675f, -0.225f, r, g, b);
     drawBox(0.1f, 0.5f, 0.05f, 0.2f, 0.675f, -0.225f, r, g, b);
 
-    // Tábua horizontal do encosto
+    // Tï¿½bua horizontal do encosto
     drawBox(0.5f, 0.15f, 0.05f, 0.0f, 0.85f, -0.225f, r, g, b);
 
     glPopMatrix();
@@ -441,11 +441,11 @@ void drawPaths() {
 }
 
 void drawRoundabout() {
-    // círculo verde (base)
+    // cï¿½rculo verde (base)
     glPushMatrix();
     glColor3f(0.0f, 0.6f, 0.2f);
     glTranslatef(0, 0.05f, 0);
-    glRotatef(90, 1, 0, 0);        // <- Deita o cilindro no chão
+    glRotatef(90, 1, 0, 0);        // <- Deita o cilindro no chï¿½o
     glutSolidCylinder(10, 0.3, 40, 40);
     glPopMatrix();
 
@@ -453,17 +453,17 @@ void drawRoundabout() {
     glPushMatrix();
     glColor3f(1.0f, 1.0f, 0.9f);
     glTranslatef(0, 0.06f, 0);
-    glRotatef(90, 1, 0, 0);        // <- Deita o cilindro no chão
+    glRotatef(90, 1, 0, 0);        // <- Deita o cilindro no chï¿½o
     glutSolidCylinder(10.5f, 0.1f, 40, 40);
     glPopMatrix();
 
-    // caixa d'água (em pé, sem rotação)
+    // caixa d'ï¿½gua (em pï¿½, sem rotaï¿½ï¿½o)
     drawCylinder(0, 0.5f, 0, 3.0f, 5.0f, 1.0f, 1.0f, 1.0f);
 }
 
 void drawVegetation() {
 
-    // Árvores distribuídas
+    // ï¿½rvores distribuï¿½das
     drawTree(-18, 0, -18);
     drawTree(18, 0, -18);
     drawTree(-18, 0, 18);
@@ -505,12 +505,12 @@ void drawBenchDetailed(float x, float y, float z, float rot) {
     glRotatef(rot, 0, 1, 0);
     glColor3f(0.6f, 0.3f, 0.1f);
 
-    // Parâmetros do banco
+    // Parï¿½metros do banco
     float seatWidth = 2.5f;
     float seatThickness = 0.2f;
     float seatDepth = 0.7f;
     float seatCenterY = 0.5f;              // como antes (centro do assento)
-    float seatTop = seatCenterY + seatThickness * 0.5f; // altura da superfície do assento
+    float seatTop = seatCenterY + seatThickness * 0.5f; // altura da superfï¿½cie do assento
 
     // --- Assento ---
     glPushMatrix();
@@ -519,23 +519,23 @@ void drawBenchDetailed(float x, float y, float z, float rot) {
     glutSolidCube(1.0f);
     glPopMatrix();
 
-    // --- Encosto (CORRIGIDO: rotação em torno da base do encosto) ---
+    // --- Encosto (CORRIGIDO: rotaï¿½ï¿½o em torno da base do encosto) ---
     float backHeight = 0.8f;
     float backThickness = 0.2f;
     float backDepth = backThickness; // profundidade (espessura) do encosto
     float seatHalfDepth = seatDepth * 0.5f;
 
-    // Posição Z do encosto: um pouco atrás do assento
+    // Posiï¿½ï¿½o Z do encosto: um pouco atrï¿½s do assento
     float backZ = - (seatHalfDepth + backDepth * 0.5f);
 
     glPushMatrix();
-    // 1) transladar para o ponto de pivô (a base do encosto, na superfície do assento)
+    // 1) transladar para o ponto de pivï¿½ (a base do encosto, na superfï¿½cie do assento)
     glTranslatef(0.0f, seatTop, backZ);
 
-    // 2) rotacionar em X (pivot está na base)
+    // 2) rotacionar em X (pivot estï¿½ na base)
     glRotatef(-15.0f, 1.0f, 0.0f, 0.0f);
 
-    // 3) desenhar o cubo deslocado para cima de modo que sua base coincida com o pivô
+    // 3) desenhar o cubo deslocado para cima de modo que sua base coincida com o pivï¿½
     glTranslatef(0.0f, backHeight * 0.5f, 0.0f);
 
     // 4) escala do encosto
@@ -545,7 +545,7 @@ void drawBenchDetailed(float x, float y, float z, float rot) {
 
     // --- Pernas ---
     float legH = 0.5f;
-    float legX = seatWidth * 0.4f; // distância lateral das pernas
+    float legX = seatWidth * 0.4f; // distï¿½ncia lateral das pernas
     float legZ = seatDepth * 0.35f;
 
     // Frente esquerda
@@ -562,14 +562,14 @@ void drawBenchDetailed(float x, float y, float z, float rot) {
     glutSolidCube(1.0f);
     glPopMatrix();
 
-    // Trás esquerda
+    // Trï¿½s esquerda
     glPushMatrix();
     glTranslatef(-legX, legH * 0.5f, -legZ);
     glScalef(0.2f, legH, 0.2f);
     glutSolidCube(1.0f);
     glPopMatrix();
 
-    // Trás direita
+    // Trï¿½s direita
     glPushMatrix();
     glTranslatef(legX, legH * 0.5f, -legZ);
     glScalef(0.2f, legH, 0.2f);
@@ -650,9 +650,9 @@ void processMovement() {
 }
 
 void drawFront() {
-    //chão 1 segundo andar
+    //chï¿½o 1 segundo andar
     drawFloor(300, 60, 0, 15, -35, 0.5f, 0.5f, 0.5f);
-    //chão 2 segundo andar
+    //chï¿½o 2 segundo andar
     drawFloor(300, 60, 0, 30, -35, 1, 1, 0.85);
 
     //parede grande esquerda a porta
@@ -771,11 +771,11 @@ void drawFront() {
     drawWindowFrame(15, 8, 0.5f, -130, 25, -46, 0);
 
     //Lado Direito
-    //Salas Repartição
-    //Parede a direita grande repartição
+    //Salas Repartiï¿½ï¿½o
+    //Parede a direita grande repartiï¿½ï¿½o
     drawBox(140,30,1,80,15,-20,1,1,0.85);
 
-    //Parede a direita que fecha a repartição
+    //Parede a direita que fecha a repartiï¿½ï¿½o
     drawBox(1,30,15,10,15,-13,1,1,0.85);
 
     //portas a direita da entrada
@@ -784,11 +784,11 @@ void drawFront() {
     drawClosedDoor(5,10,1,90,0,-20.5,180);
 
     //Lado Esquerdo
-    //Salas Repartição
-    //Parede a esquerda grande repartição
+    //Salas Repartiï¿½ï¿½o
+    //Parede a esquerda grande repartiï¿½ï¿½o
     drawBox(140,30,1,-80,15,-20,1,1,0.85);
 
-    //Parede a esquerda que fecha a repartição
+    //Parede a esquerda que fecha a repartiï¿½ï¿½o
     drawBox(1,30,15,-10,15,-13,1,1,0.85);
 
     //portas a esquerda da entrada
@@ -797,14 +797,14 @@ void drawFront() {
     drawClosedDoor(5,10,1,-90,0,-20.5,180);
 
     //Lado Direito em cima
-    //Salas Repartição
+    //Salas Repartiï¿½ï¿½o
     //portas a direita da entrada
     drawClosedDoor(5,10,1,30,15,-20.5,180);
     drawClosedDoor(5,10,1,60,15,-20.5,180);
     drawClosedDoor(5,10,1,90,15,-20.5,180);
 
     //Lado Esquerdo
-    //Salas Repartição
+    //Salas Repartiï¿½ï¿½o
     //portas a esquerda da entrada
     drawClosedDoor(5,10,1,-30,15,-20.5,180);
     drawClosedDoor(5,10,1,-60,15,-20.5,180);
@@ -816,21 +816,21 @@ void drawScene() {
     // Segunda chamada rotacionada em 90 graus em Y e deslocada
     glPushMatrix();
     glRotatef(90.0f, 0.0f, 1.0f, 0.0f);
-    // Translação aplicada após a rotação (ajusta no sistema local rotacionado)
-    glTranslatef(200.0f, 0.0f, 215.0f);
+    // Translaï¿½ï¿½o aplicada apï¿½s a rotaï¿½ï¿½o (ajusta no sistema local rotacionado)
+    glTranslatef(215.0f, 0.0f, 215.0f);
     drawFront();
     glPopMatrix();
 
     // Terceira chamada rotacionada em 180 graus em Y e deslocada
     glPushMatrix();
     glRotatef(180.0f, 0.0f, 1.0f, 0.0f);
-    // Translação aplicada após a rotação (ajusta no sistema local rotacionado)
-    glTranslatef(0.0f, 0.0f, 415.0f);
+    // Translaï¿½ï¿½o aplicada apï¿½s a rotaï¿½ï¿½o (ajusta no sistema local rotacionado)
+    glTranslatef(0.0f, 0.0f, 430.0f);
     drawFront();
     glPopMatrix();
 
 	//entrada
-    drawFloor(800, 800, 0, 0, 0, 0.5f, 0.5f, 0.5f);
+    drawFloor(1000, 1000, 0, 0, 0, 0.5f, 0.5f, 0.5f);
     //pilar 1 entrada
     drawPillar(2, 30, -10, 0, 25, 1, 1, 0.85);
     //pilar 2 entrada
@@ -843,12 +843,40 @@ void drawScene() {
     //parede acima pilar meio 4
     drawBox(60,5,1,-180,15,-65,1,1,0.85); 	
     //parede acima pilar meio 5
-    drawBox(1,5,20,-210,15,-55,1,1,0.85); 	
+    drawBox(1,5,20,-210,15,-55,1,1,0.85);
+    //parede quina traseira interior 1
+    drawBox(1,30,20,170,15,-375,1,1,0.85);
+    //parede quina traseira interior 2
+    drawBox(20,30,1,160,15,-385,1,1,0.85);
+    //parede quina traseira interior 3
+    drawBox(1,30,45,195,15,-387.5,1,1,0.85);
+    //parede quina traseira interior 4
+    drawBox(45,30,1,172.5,15,-410,1,1,0.85);
+    //parede quina traseira exterior 1	
+    drawBox(1,30,60,210,15,-395,1,1,0.85);
+    //parede quina traseira exterior 2	
+    drawBox(60,30,1,180,15,-425,1,1,0.85);
 
-    //chão 3 segundo andar
+    //parede fechamento traseira esquerda
+    drawBox(1,30,60,-150,15,-395,1,1,0.85);
+
+    //parede fechamento traseira meio 1
+    drawBox(20,30,1,0,15,-425,1,1,0.85); 
+    //parede fechamento traseira meio 2
+    drawBox(20,30,1,0,15,-410,1,1,0.85);
+
+    //chï¿½o 3 segundo andar
     drawFloor(60, 75, -180, 30, -27.5, 1, 1, 0.85);
-    //chão 4 segundo andar
+    //chï¿½o 4 segundo andar
     drawFloor(60, 75, -180, 15, -27.5, 0.5f, 0.5f, 0.5f);
+    //chï¿½o cima quina esquerda
+    drawFloor(60, 75, 180, 15, -27.5, 0.5f, 0.5f, 0.5f);
+    //chï¿½o cima quina traseira
+    drawFloor(60, 60, 180, 15, -395, 0.5f, 0.5f, 0.5f);
+    //chï¿½o teto quina esquerda
+    drawFloor(60, 75, 180, 30, -27.5, 1, 1, 0.85);
+    //chï¿½o teto quina traseira
+    drawFloor(60, 60, 180, 30, -395, 1, 1, 0.85);
     
     //varanda entre os pilares
     drawFloor(60, 40, 0, 15, 5, 0.5f, 0.5f, 0.5f);
@@ -907,11 +935,11 @@ void drawScene() {
     //Telhado da frente
     drawRoof(60, 55, 10, 0, 30, -2.5, 0, 0.6f, 0.2f, 0.0f);
     //Telhado direito 
-    drawRoof(60, 360, 10, 180, 30, -170, 0, 0.6f, 0.2f, 0.0f);
+    drawRoof(60, 375, 10, 180, 30, -177.5, 0, 0.6f, 0.2f, 0.0f);
     //Telhado esquerdo
     drawRoof(60, 75, 10, -180, 30, -27.5, 0, 0.6f, 0.2f, 0.0f);
     //Telhado traseiro
-    drawRoof(60, 360, 10, 30, 30, -380, 90, 0.6f, 0.2f, 0.0f);
+    drawRoof(60, 360, 10, 30, 30, -395, 90, 0.6f, 0.2f, 0.0f);
     
 
     //pilar 17 meio
@@ -933,7 +961,7 @@ void drawScene() {
 
 
     //Segunda passagem
-    //Delimitação Auditorio Parede
+    //Delimitaï¿½ï¿½o Auditorio Parede
     drawBox(1,15,30,180,7.5,-5,1,1,0.85);
     drawBox(1,3,15,180,13.3,-27.5,1,1,0.85);
     drawDoorFrame(14.2,12,1,180,0,-27.5,90);
@@ -941,17 +969,18 @@ void drawScene() {
     drawClosedDoor(7,12,1,183,0,-21.5,25);
     drawBox(1,15,15,180,7.5,-42.5,1,1,0.85);
 
-    //Saída Auditorio
+    //Saï¿½da Auditorio
     
     
     
 
     //Porta aberta saida auditorio
-    drawBox(7.5,15,1,154,7.5,-45,1,1,0.85);
-    drawBox(14.5,4.5,1,165,12.5,-45,1,1,0.85);
-    drawDoorFrame(14.5,10,1,165,0,-45,0);
-    drawClosedDoor(6.5,10,1,169,0,-45,180);
-    drawClosedDoor(7.5,10,1,158.5,0,-48.5,90);
+    drawBox(1,30,20,170,15,-55,1,1,0.85);
+    drawBox(7.5,15,1,168.625,7.5,-45,1,1,0.85);
+    drawBox(14.5,4.5,1,157.5,12.5,-45,1,1,0.85);
+    drawDoorFrame(14.5,10,1,157.5,0,-45,0);
+    drawClosedDoor(6.5,10,1,161.425,0,-45,180);
+    drawClosedDoor(7.5,10,1,150.425,0,-48.5,90);
 
     drawBox(7.5,15,1,176.2,7.5,-45,1,1,0.85);
     
@@ -961,7 +990,7 @@ void drawScene() {
     drawTable(159,0,-12,5);
     drawTable(171,0,-12,5);
 
-    //Fechamento auditório
+    //Fechamento auditï¿½rio
     drawBox(30,15,1,195,7.5,-45,1,1,0.85);
 
     //Preenchendo o aduitorio
@@ -1001,7 +1030,7 @@ void drawScene() {
     drawChair(203,0,-19,5,180);
     drawChair(206,0,-19,5,180);
 
-    //Telão
+    //Telï¿½o
     drawBox(13,8,1,195,10,-44,0.8,0.8,0.8);
 }
 
@@ -1072,8 +1101,8 @@ void reshape(int w, int h) {
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    // Aumenta o far plane para 5000.0f para expandir o alcance de renderização
-    // e ajusta o near para 0.5f para preservar precisão de profundidade
+    // Aumenta o far plane para 5000.0f para expandir o alcance de renderizaï¿½ï¿½o
+    // e ajusta o near para 0.5f para preservar precisï¿½o de profundidade
     gluPerspective(60.0, (float)w / h, 0.5, 5000.0);
 
     glMatrixMode(GL_MODELVIEW);
