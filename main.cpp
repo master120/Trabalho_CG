@@ -400,6 +400,36 @@ void drawChair(float x, float y, float z, float scale, float rotY = 0.0f) {
     glPopMatrix();
 }
 
+// Desenha uma escada composta por 'steps' degraus.
+// steps: número de degraus
+// stepWidth: largura (eixo X) de cada degrau
+// stepHeight: altura (eixo Y) de cada degrau
+// stepDepth: profundidade (eixo Z) de cada degrau
+// x,y,z: posição do ponto de referência (topo da escada, ou início) - a função translada para cá
+// rotY: rotação em torno do eixo Y (graus)
+// r,g,b: cor dos degraus
+void drawStairs(int steps, float stepWidth, float stepHeight, float stepDepth,
+                float x, float y, float z, float rotY = 0.0f,
+                float r = 0.6f, float g = 0.6f, float b = 0.6f) {
+    if (steps <= 0) return;
+
+    glPushMatrix();
+    glTranslatef(x, y, z);
+    glRotatef(rotY, 0.0f, 1.0f, 0.0f);
+
+    // Desenha degraus subindo ao longo do eixo -Z (cada degrau recua em Z e sobe em Y)
+    for (int i = 0; i < steps; ++i) {
+        float centerY = (stepHeight * 0.5f) + i * stepHeight; // centro do degrau em Y
+        float centerZ = - (stepDepth * 0.5f) - i * stepDepth; // centro do degrau em Z
+
+        drawBox(stepWidth, stepHeight, stepDepth,
+                0.0f, centerY, centerZ,
+                r, g, b);
+    }
+
+    glPopMatrix();
+}
+
 void drawTable(float x, float y, float z, float scale) {
     glPushMatrix();
     glTranslatef(x, y, z);
@@ -779,6 +809,7 @@ void drawFront() {
     drawClosedDoor(5,10,1,30,0,-20.5,180);
     drawClosedDoor(5,10,1,60,0,-20.5,180);
     drawClosedDoor(5,10,1,90,0,-20.5,180);
+    drawClosedDoor(5,10,1,120,0,-20.5,180);
 
     //Lado Esquerdo
     //Salas Reparti��o
@@ -792,6 +823,7 @@ void drawFront() {
     drawClosedDoor(5,10,1,-30,0,-20.5,180);
     drawClosedDoor(5,10,1,-60,0,-20.5,180);
     drawClosedDoor(5,10,1,-90,0,-20.5,180);
+    drawClosedDoor(5,10,1,-120,0,-20.5,180);
 
     //Lado Direito em cima
     //Salas Reparti��o
@@ -799,6 +831,7 @@ void drawFront() {
     drawClosedDoor(5,10,1,30,15,-20.5,180);
     drawClosedDoor(5,10,1,60,15,-20.5,180);
     drawClosedDoor(5,10,1,90,15,-20.5,180);
+    drawClosedDoor(5,10,1,120,15,-20.5,180);
 
     //Lado Esquerdo
     //Salas Reparti��o
@@ -806,6 +839,7 @@ void drawFront() {
     drawClosedDoor(5,10,1,-30,15,-20.5,180);
     drawClosedDoor(5,10,1,-60,15,-20.5,180);
     drawClosedDoor(5,10,1,-90,15,-20.5,180);
+    drawClosedDoor(5,10,1,-120,15,-20.5,180);
 }
 
 void drawWindowsOnCorner(){
@@ -819,6 +853,36 @@ void drawWindowsOnCorner(){
     drawWindowFrame(15, 8, 0.5f, -211, 12.5, -32.5, 90);
     drawWindowFrame(15, 8, 0.5f, -211, 25, -2.5, 90);
     drawWindowFrame(15, 8, 0.5f, -211, 25, -32.5, 90);
+}
+
+void drawDoorsOnCorner(){
+    //Portas Canto Esquerdo
+    drawClosedDoor(5,10,1,-150,15,-20.5,180);
+    drawClosedDoor(5,10,1,-180,15,-20.5,180);
+    drawClosedDoor(5,10,1,-150,0,-20.5,180);
+    drawClosedDoor(5,10,1,-180,0,-20.5,180);
+
+    //Canto direito
+    drawClosedDoor(5,10,1,150,15,-20.5,180);
+    drawClosedDoor(5,10,1,180,15,-20.5,180);
+
+    drawClosedDoor(5,10,1,194,15,-35,-90);
+    drawClosedDoor(5,10,1,194,15,-65,-90);
+
+    //Canto traseiro
+    drawClosedDoor(5,10,1,194,15,-365,-90);
+    drawClosedDoor(5,10,1,194,15,-396,-90);
+
+    drawClosedDoor(5,10,1,150,15,-409,0);
+    drawClosedDoor(5,10,1,180,15,-409,0);
+
+    drawClosedDoor(5,10,1,194,0,-365,-90);
+    drawClosedDoor(5,10,1,194,0,-396,-90);
+
+    drawClosedDoor(5,10,1,150,0,-409,0);
+    drawClosedDoor(5,10,1,180,0,-409,0);
+
+
 }
 
 void drawScene() {
@@ -857,6 +921,10 @@ void drawScene() {
     drawWindowsOnCorner();
     glPopMatrix();
 
+    //Portas Canto Esquerdo
+    drawDoorsOnCorner();
+
+
 	//entrada
     drawFloor(1000, 1000, 0, 0, 0, 0.5f, 0.5f, 0.5f);
     //pilar 1 entrada
@@ -886,13 +954,15 @@ void drawScene() {
     drawBox(60,30,1,180,15,-425,1,1,0.85);
 
 
+
     //parede quina direita interior 1
     drawBox(1,15,45,195,22.5,-42.5,1,1,0.85);
     //parede quina direita interior 2
     drawBox(45,15,1,172.5,22.5,-20,1,1,0.85);
-
     //parede quina direita interior 3
     drawBox(20,15,1,160,22.5,-45,1,1,0.85);
+    //parede quina direita interior 4
+    drawBox(25,15,1,182.5,7.5,-65,1,1,0.85);
 
 
     //parede fechamento traseira esquerda
@@ -951,6 +1021,8 @@ void drawScene() {
     //parede 3 esquerda quadrado
     drawBox(1,30,55,-210,15,-17.5,1,1,0.85);	
 
+    //parede 4 esquerda quadrado
+    drawBox(60,30,1,-180,15,-20,1,1,0.85);
 
     //parede acima da porta de entrada
     drawBox(10,8,1,0,11,0,1,1,0.85); 
@@ -1069,6 +1141,17 @@ void drawScene() {
 
     //Tel�o
     drawBox(13,8,1,195,10,-44,0.8,0.8,0.8);
+
+    //Escadaria
+    //Escadas
+    drawStairs(7, 10, 1, 1, 210, 0, -210, -90.0f);
+    drawStairs(8, 10, 1, 1, 217.5, 7, -220, 90.0f);
+    drawFloor(8, 20, 221.125, 7, -215, 0.5f, 0.5f, 0.5f);
+    drawBox(1,30,20,225,15,-215,1,1,0.85);
+
+    drawBox(15,30,1,217.5,15,-205,1,1,0.85);
+    drawBox(15,30,1,217.5,15,-225,1,1,0.85);
+    drawFloor(15, 20, 217.5, 30, -215, 1, 1, 0.85);
 }
 
 void display() {
