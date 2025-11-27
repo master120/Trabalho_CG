@@ -7,7 +7,7 @@ float pitch = 0.0f;
 
 float dirX, dirY, dirZ;
 
-float speed = 0.05f;
+float speed = 0.60f;
 float mouseSensitivity = 0.15f;
 
 bool keys[256] = { false };
@@ -15,7 +15,51 @@ bool keys[256] = { false };
 int windowWidth = 900, windowHeight = 600;
 bool warpMouse = false;
 
-//atualiza vetor de direção
+
+
+void drawCube(float x, float y, float z, float size, float r, float g, float b) {
+    glPushMatrix();
+    glColor3f(r, g, b);
+    glTranslatef(x, y, z);
+    glutSolidCube(size);
+    glPopMatrix();
+}
+
+void drawCylinder(float x, float y, float z, float radius, float height, float r, float g, float b) {
+    glPushMatrix();
+    glColor3f(r, g, b);
+    glTranslatef(x, y, z);
+    glRotatef(-90, 1, 0, 0);
+    GLUquadric* q = gluNewQuadric();
+    gluCylinder(q, radius, radius, height, 20, 20);
+    gluDisk(q, 0, radius, 20, 20);
+    glTranslatef(0, 0, height);
+    gluDisk(q, 0, radius, 20, 20);
+    gluDeleteQuadric(q);
+    glPopMatrix();
+}
+
+void drawTree(float x, float y, float z) {
+    // tronco
+    drawCylinder(x, y, z, 0.2f, 1.2f, 0.4f, 0.2f, 0.1f);
+    // copa
+    glPushMatrix();
+    glColor3f(0.0f, 0.6f, 0.1f);
+    glTranslatef(x, y + 1.2f, z);
+    glutSolidSphere(0.8f, 20, 20);
+    glPopMatrix();
+}
+
+void drawBush(float x, float y, float z) {
+    glPushMatrix();
+    glColor3f(0.1f, 0.7f, 0.2f);
+    glTranslatef(x, y, z);
+    glutSolidSphere(0.4f, 20, 20);
+    
+    glPopMatrix();
+}
+
+//atualiza vetor de dire??o
 void updateCameraDirection() {
     float radYaw = yaw * M_PI / 180.0f;
     float radPitch = pitch * M_PI / 180.0f;
@@ -25,21 +69,208 @@ void updateCameraDirection() {
     dirZ = sin(radYaw) * cos(radPitch);
 }
 
+// Desenha um telhado em empena (duas águas)
+// Parâmetros:
+// width: largura total do telhado (eixo X)
+// depth: comprimento do telhado (eixo Z)
+// height: altura do beiral até o ápice (elevação da cumeeira)
+// x,y,z: posição da base do telhado (y = topo das paredes onde o telhado se assenta)
+// rotY: rotação em torno do eixo Y (graus)
+// r,g,b: cor do telhado
+void drawRoof(float width, float depth, float height,
+              float x = 0.0f, float y = 0.0f, float z = 0.0f,
+              float rotY = 0.0f,
+              float r = 0.6f, float g = 0.2f, float b = 0.0f) {
+    float halfW = width / 2.0f;
+    float halfD = depth / 2.0f;
 
-
-void drawBox(float w, float h, float d) {
     glPushMatrix();
+    glTranslatef(x, y, z);
+    glRotatef(rotY, 0.0f, 1.0f, 0.0f);
+
+    // Faces do telhado (duas águas)
+    glColor3f(r, g, b);
+
+    // Lateral esquerda (quad)
+    glBegin(GL_QUADS);
+        glVertex3f(-halfW, 0.0f, -halfD);
+        glVertex3f(0.0f, height, -halfD);
+        glVertex3f(0.0f, height, halfD);
+        glVertex3f(-halfW, 0.0f, halfD);
+    glEnd();
+
+    // Lateral direita (quad)
+    glBegin(GL_QUADS);
+        glVertex3f(halfW, 0.0f, -halfD);
+        glVertex3f(0.0f, height, -halfD);
+        glVertex3f(0.0f, height, halfD);
+        glVertex3f(halfW, 0.0f, halfD);
+    glEnd();
+
+    // Empenas frontais (triângulos)
+    glBegin(GL_TRIANGLES);
+        glVertex3f(-halfW, 0.0f, -halfD);
+        glVertex3f(halfW, 0.0f, -halfD);
+        glVertex3f(0.0f, height, -halfD);
+    glEnd();
+
+    glBegin(GL_TRIANGLES);
+        glVertex3f(-halfW, 0.0f, halfD);
+        glVertex3f(halfW, 0.0f, halfD);
+        glVertex3f(0.0f, height, halfD);
+    glEnd();
+
+    // Desenha contorno das faces para arestas em preto, sem diagonais
+    glColor3f(0.0f, 0.0f, 0.0f);
+    glLineWidth(1.5f);
+
+    // Contorno lateral esquerda
+    glBegin(GL_LINE_LOOP);
+        glVertex3f(-halfW, 0.0f, -halfD);
+        glVertex3f(0.0f, height, -halfD);
+        glVertex3f(0.0f, height, halfD);
+        glVertex3f(-halfW, 0.0f, halfD);
+    glEnd();
+
+    // Contorno lateral direita
+    glBegin(GL_LINE_LOOP);
+        glVertex3f(halfW, 0.0f, -halfD);
+        glVertex3f(0.0f, height, -halfD);
+        glVertex3f(0.0f, height, halfD);
+        glVertex3f(halfW, 0.0f, halfD);
+    glEnd();
+
+    // Contorno empena frontal
+    glBegin(GL_LINE_LOOP);
+        glVertex3f(-halfW, 0.0f, -halfD);
+        glVertex3f(halfW, 0.0f, -halfD);
+        glVertex3f(0.0f, height, -halfD);
+    glEnd();
+
+    // Contorno empena traseira
+    glBegin(GL_LINE_LOOP);
+        glVertex3f(-halfW, 0.0f, halfD);
+        glVertex3f(halfW, 0.0f, halfD);
+        glVertex3f(0.0f, height, halfD);
+    glEnd();
+
+    glPopMatrix();
+}
+
+
+
+
+// Agora recebe largura, altura, profundidade, posicao Y e COR (R, G, B)
+// Par?metros:
+// w, h, d: Tamanho
+// tx, ty, tz: Transla??o (movimento extra relativo ao centro) - Padr?o 0.0
+// r, g, b: Cor - Padr?o 1.0 (Branco)
+void drawBox(float w, float h, float d, 
+             float tx = 0.0f, float ty = 0.0f, float tz = 0.0f, 
+             float r = 1.0f, float g = 1.0f, float b = 1.0f) {
+    glPushMatrix();
+    
+    // 1. Cor
+    glColor3f(r, g, b);
+
+    // 2. Transla??o (Agora em 3 eixos)
+    glTranslatef(tx, ty, tz);
+    
+    // 3. Escala
     glScalef(w, h, d);
+    
+    // 4. Desenho
+    // Desenha sólido
     glutSolidCube(1.0f);
+
+    // Desenha arestas em preto por cima do sólido (use wireframe para evitar diagonais)
+    glColor3f(0.0f, 0.0f, 0.0f);
+    glLineWidth(1.5f);
+    glutWireCube(1.0f);
+    
+    glPopMatrix();
+}
+
+// Desenha só a moldura da janela (sem vidro).
+// width: largura total (x), height: altura total (y), frameThickness: espessura da moldura
+// x,y,z: posição do topo central da janela
+// rotY: rotação em Y
+// r,g,b: cor da moldura (padrão marrom)
+void drawWindowFrame(float width, float height, float frameThickness,
+                     float x, float y, float z, float rotY = 0.0f,
+                     float r=0.55f, float g=0.27f, float b=0.07f) {
+
+    glPushMatrix();
+    glTranslatef(x, y, z);
+    glRotatef(rotY, 0.0f, 1.0f, 0.0f);
+
+    // cor da moldura
+    glColor3f(r, g, b);
+
+    // moldura superior
+    drawBox(width, frameThickness, frameThickness, 0.0f, 0.0f, 0.0f, r, g, b);
+
+    // moldura inferior
+    glPushMatrix();
+    glTranslatef(0.0f, -height + frameThickness, 0.0f);
+    drawBox(width, frameThickness, frameThickness, 0.0f, 0.0f, 0.0f, r, g, b);
+    glPopMatrix();
+
+    // moldura esquerda
+    glPushMatrix();
+    glTranslatef(-width/2.0f + frameThickness/2.0f, -height/2.0f, 0.0f);
+    drawBox(frameThickness, height, frameThickness, 0.0f, 0.0f, 0.0f, r, g, b);
+    glPopMatrix();
+
+    // moldura direita
+    glPushMatrix();
+    glTranslatef(width/2.0f - frameThickness/2.0f, -height/2.0f, 0.0f);
+    drawBox(frameThickness, height, frameThickness, 0.0f, 0.0f, 0.0f, r, g, b);
+    glPopMatrix();
+
+    // Vidro (insere um plano no centro da moldura)
+    float innerW = width - 2.0f * frameThickness;
+    float innerH = height - 2.0f * frameThickness;
+    if (innerW > 0.0f && innerH > 0.0f) {
+        // desenha vidro levemente deslocado para frente (evita z-fighting)
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        glPushMatrix();
+        glTranslatef(0.0f, -height/2.0f, 0.001f);
+        // vidro azul claro semi-transparente
+        glColor4f(0.7f, 0.9f, 1.0f, 0.45f);
+        glBegin(GL_QUADS);
+            glVertex3f(-innerW/2.0f,  innerH/2.0f, 0.0f);
+            glVertex3f( innerW/2.0f,  innerH/2.0f, 0.0f);
+            glVertex3f( innerW/2.0f, -innerH/2.0f, 0.0f);
+            glVertex3f(-innerW/2.0f, -innerH/2.0f, 0.0f);
+        glEnd();
+
+        // contorno preto do vidro
+        glColor3f(0.0f, 0.0f, 0.0f);
+        glLineWidth(1.2f);
+        glBegin(GL_LINE_LOOP);
+            glVertex3f(-innerW/2.0f,  innerH/2.0f, 0.0f);
+            glVertex3f( innerW/2.0f,  innerH/2.0f, 0.0f);
+            glVertex3f( innerW/2.0f, -innerH/2.0f, 0.0f);
+            glVertex3f(-innerW/2.0f, -innerH/2.0f, 0.0f);
+        glEnd();
+
+        glPopMatrix();
+        glDisable(GL_BLEND);
+    }
+
     glPopMatrix();
 }
 
 //parede
+
 //wallLength = largura da parede (horizontal)
 //wallHeight = altura
 //thickness  = espessura
-//(x, y, z) = posição do centro da parede
-//rotY = rotação para posicionar a parede
+//(x, y, z) = posi??o do centro da parede
+//rotY = rota??o para posicionar a parede
 void drawWall(float wallLength, float wallHeight, float thickness,
               float x, float y, float z, float rotY = 0.0f,
               float r=0.8f, float g=0.8f, float b=0.8f) {
@@ -52,65 +283,339 @@ void drawWall(float wallLength, float wallHeight, float thickness,
     glPopMatrix();
 }
 
-
-void drawWindow(float width, float height, float frameThickness,
-                float x, float y, float z, float rotY = 0.0f,
-                float r=0.5f, float g=0.5f, float b=0.6f) {
-
-    glPushMatrix();
-    glTranslatef(x, y, z);
-    glRotatef(rotY, 0, 1, 0);
-
-    glColor3f(r, g, b);
-
-    //moldura horizontal superior
-    drawBox(width, frameThickness, frameThickness);
-
-    //moldura horizontal inferior
-    glPushMatrix();
-    glTranslatef(0, -height + frameThickness, 0);
-    drawBox(width, frameThickness, frameThickness);
-    glPopMatrix();
-
-    //lateral esquerda
-    glPushMatrix();
-    glTranslatef(-width/2 + frameThickness/2, -height/2, 0);
-    drawBox(frameThickness, height, frameThickness);
-    glPopMatrix();
-
-    //lateral direita
-    glPushMatrix();
-    glTranslatef(width/2 - frameThickness/2, -height/2, 0);
-    drawBox(frameThickness, height, frameThickness);
-    glPopMatrix();
-
-    glPopMatrix();
-}
-
-
 void drawPillar(float size, float height,
                 float x, float y, float z,
                 float r=0.7f, float g=0.7f, float b=0.7f) {
 
     glPushMatrix();
-    glColor3f(r, g, b);
     glTranslatef(x, y + height/2.0f, z);
-    drawBox(size, height, size);
+    drawBox(size, height, size, 0.0f, 0.0f, 0.0f, r, g, b);
     glPopMatrix();
 }
 
+
+
+void drawClosedDoor(float w, float h, float thickness, 
+                    float x, float y, float z, float rotY = 0.0f) {
+    glPushMatrix();
+    glTranslatef(x, y + h/2.0f, z); // Sobe metade da altura para ficar no chao
+    glRotatef(rotY, 0, 1, 0);
+
+    // 1. A Porta (Marrom Madeira)
+    drawBox(w, h, thickness, 0.0f, 0.0f, 0.0f, 0.55f, 0.27f, 0.07f);
+
+    // 2. A Ma?aneta (Amarela/Dourada)
+    // Pequeno cubo deslocado para a direita e um pouco pra frente
+    glPushMatrix();
+    glTranslatef(w/2.5f, 0.0f, thickness/1.5f); // Posi??o relativa ao centro da porta
+    // Maçaneta dourada
+    drawBox(0.1f, 0.1f, 0.1f, 0.0f, 0.0f, 0.0f, 1.0f, 0.8f, 0.0f);
+    glPopMatrix();
+    glPopMatrix();
+}
 
 void drawFloor(float width, float depth,
                float x, float y, float z,
                float r=0.3f, float g=0.3f, float b=0.3f) {
 
     glPushMatrix();
-    glColor3f(r, g, b);
     glTranslatef(x, y, z);
-    drawBox(width, 0.1f, depth);
+
+    // Chama o drawBox atualizado
+    // Parâmetros: 
+    // width (largura), 0.1f (espessura fina), depth (profundidade)
+    // tx, ty, tz: translação (colocados em 0.0f)
+    // r, g, b (cores)
+    drawBox(width, 0.1f, depth, 0.0f, 0.0f, 0.0f, r, g, b);
+
     glPopMatrix();
 }
 
+void drawDoorFrame(float width, float height, float thickness, 
+                   float x, float y, float z, float rotY = 0.0f) {
+    glPushMatrix();
+    glTranslatef(x, y, z);
+    glRotatef(rotY, 0, 1, 0);
+
+    // Cor Marrom Escuro para o batente
+    float r = 0.4f, g = 0.2f, b = 0.0f;
+    float frameThick = 0.2f; // Espessura da madeira do batente
+
+    // 1. Pilar Esquerdo
+    glPushMatrix();
+    glTranslatef(-(width/2.0f), height/2.0f, 0.0f);
+    // CORRE??O AQUI: Note os 3 zeros antes do r, g, b
+    drawBox(frameThick, height, thickness, 0.0f, 0.0f, 0.0f, r, g, b);
+    glPopMatrix();
+
+    // 2. Pilar Direito
+    glPushMatrix();
+    glTranslatef((width/2.0f), height/2.0f, 0.0f);
+    // CORRE??O AQUI
+    drawBox(frameThick, height, thickness, 0.0f, 0.0f, 0.0f, r, g, b);
+    glPopMatrix();
+
+    // 3. Topo (Verga)
+    glPushMatrix();
+    glTranslatef(0.0f, height, 0.0f); 
+    // CORRE??O AQUI
+    drawBox(width + frameThick, frameThick, thickness, 0.0f, 0.0f, 0.0f, r, g, b);
+    glPopMatrix();
+
+    glPopMatrix();
+}
+
+void drawChair(float x, float y, float z, float scale, float rotY = 0.0f) {
+    glPushMatrix();
+    glTranslatef(x, y, z);
+    glRotatef(rotY, 0, 1, 0);
+    glScalef(scale, scale, scale); // Aumenta ou diminui a cadeira inteira
+
+    // Cor da madeira (Marrom)
+    float r = 0.55f, g = 0.27f, b = 0.07f;
+
+    // --- PERNAS (0.1 largura, 0.4 altura) ---
+    // Nota: O Y é 0.2 porque o drawBox desenha a partir do centro, 
+    // então para uma perna de altura 0.4 tocar o chão (0.0), o centro deve ser 0.2
+
+    // Perna Frente Esquerda
+    drawBox(0.1f, 0.4f, 0.1f, -0.2f, 0.2f, 0.2f, r, g, b);
+    // Perna Frente Direita
+    drawBox(0.1f, 0.4f, 0.1f, 0.2f, 0.2f, 0.2f, r, g, b);
+    // Perna Trás Esquerda
+    drawBox(0.1f, 0.4f, 0.1f, -0.2f, 0.2f, -0.2f, r, g, b);
+    // Perna Trás Direita
+    drawBox(0.1f, 0.4f, 0.1f, 0.2f, 0.2f, -0.2f, r, g, b);
+
+    // --- ASSENTO ---
+    // Largura 0.5, Altura fina 0.05
+    // Y = 0.4 (topo das pernas) + 0.025 (metade da altura do assento)
+    drawBox(0.5f, 0.05f, 0.5f, 0.0f, 0.425f, 0.0f, r, g, b);
+
+    // --- ENCOSTO ---
+    // Pilares do encosto (extensão das pernas traseiras)
+    drawBox(0.1f, 0.5f, 0.05f, -0.2f, 0.675f, -0.225f, r, g, b);
+    drawBox(0.1f, 0.5f, 0.05f, 0.2f, 0.675f, -0.225f, r, g, b);
+
+    // Tábua horizontal do encosto
+    drawBox(0.5f, 0.15f, 0.05f, 0.0f, 0.85f, -0.225f, r, g, b);
+
+    glPopMatrix();
+}
+
+void drawTable(float x, float y, float z, float scale) {
+    glPushMatrix();
+    glTranslatef(x, y, z);
+    glScalef(scale, scale, scale);
+
+    float r = 0.4f, g = 0.2f, b = 0.0f; // Madeira mais escura
+
+    // 4 Pernas da mesa
+    drawBox(0.15f, 0.6f, 0.15f, -0.4f, 0.3f, 0.4f, r, g, b);
+    drawBox(0.15f, 0.6f, 0.15f, 0.4f, 0.3f, 0.4f, r, g, b);
+    drawBox(0.15f, 0.6f, 0.15f, -0.4f, 0.3f, -0.4f, r, g, b);
+    drawBox(0.15f, 0.6f, 0.15f, 0.4f, 0.3f, -0.4f, r, g, b);
+
+    // Tampo da mesa
+    drawBox(1.2f, 0.05f, 1.2f, 0.0f, 0.625f, 0.0f, r, g, b);
+
+    glPopMatrix();
+}
+
+void drawPaths() {
+    glColor3f(0.94f, 0.88f, 0.65f);
+
+    // horizontal
+    glPushMatrix();
+    glTranslatef(0, 0, 0);
+    glScalef(100, 0.1, 8);
+    glutSolidCube(1);
+    glPopMatrix();
+
+    // vertical
+    glPushMatrix();
+    glTranslatef(0, 0, 0);
+    glScalef(8, 0.1, 100);
+    glutSolidCube(1);
+    glPopMatrix();
+}
+
+void drawRoundabout() {
+    // círculo verde (base)
+    glPushMatrix();
+    glColor3f(0.0f, 0.6f, 0.2f);
+    glTranslatef(0, 0.05f, 0);
+    glRotatef(90, 1, 0, 0);        // <- Deita o cilindro no chão
+    glutSolidCylinder(10, 0.3, 40, 40);
+    glPopMatrix();
+
+    // borda branca
+    glPushMatrix();
+    glColor3f(1.0f, 1.0f, 0.9f);
+    glTranslatef(0, 0.06f, 0);
+    glRotatef(90, 1, 0, 0);        // <- Deita o cilindro no chão
+    glutSolidCylinder(10.5f, 0.1f, 40, 40);
+    glPopMatrix();
+
+    // caixa d'água (em pé, sem rotação)
+    drawCylinder(0, 0.5f, 0, 3.0f, 5.0f, 1.0f, 1.0f, 1.0f);
+}
+
+void drawVegetation() {
+
+    // Árvores distribuídas
+    drawTree(-18, 0, -18);
+    drawTree(18, 0, -18);
+    drawTree(-18, 0, 18);
+    drawTree(18, 0, 18);
+    drawTree(-10, 0, -10);
+    drawTree(10, 0, -10);
+    drawTree(-10, 0, 10);
+    drawTree(10, 0, 10);
+    drawTree(-32, 0, -32);
+    drawTree(32, 0, -32);
+    drawTree(-32, 0, 32);
+    drawTree(32, 0, 32);
+    
+
+    // Arbustos perto dos bancos
+    drawBush(-12, 0,  6);
+    drawBush(-12, 0, -6);
+    drawBush(12, 0,  6);
+    drawBush(12, 0, -6);
+
+    drawBush(6, 0, -12);
+    drawBush(-6, 0, -12);
+    drawBush(6, 0, 12);
+    drawBush(-6, 0, 12);
+}
+
+void drawGrass() {
+    glColor3f(0.1f, 0.7f, 0.2f);
+    glPushMatrix();
+    glTranslatef(0, -0.1f, 0);
+    glScalef(100, 0.1f, 100);
+    glutSolidCube(1);
+    glPopMatrix();
+}
+
+void drawBenchDetailed(float x, float y, float z, float rot) {
+    glPushMatrix();
+    glTranslatef(x, y, z);
+    glRotatef(rot, 0, 1, 0);
+    glColor3f(0.6f, 0.3f, 0.1f);
+
+    // Parâmetros do banco
+    float seatWidth = 2.5f;
+    float seatThickness = 0.2f;
+    float seatDepth = 0.7f;
+    float seatCenterY = 0.5f;              // como antes (centro do assento)
+    float seatTop = seatCenterY + seatThickness * 0.5f; // altura da superfície do assento
+
+    // --- Assento ---
+    glPushMatrix();
+    glTranslatef(0.0f, seatCenterY, 0.0f);
+    glScalef(seatWidth, seatThickness, seatDepth);
+    glutSolidCube(1.0f);
+    glPopMatrix();
+
+    // --- Encosto (CORRIGIDO: rotação em torno da base do encosto) ---
+    float backHeight = 0.8f;
+    float backThickness = 0.2f;
+    float backDepth = backThickness; // profundidade (espessura) do encosto
+    float seatHalfDepth = seatDepth * 0.5f;
+
+    // Posição Z do encosto: um pouco atrás do assento
+    float backZ = - (seatHalfDepth + backDepth * 0.5f);
+
+    glPushMatrix();
+    // 1) transladar para o ponto de pivô (a base do encosto, na superfície do assento)
+    glTranslatef(0.0f, seatTop, backZ);
+
+    // 2) rotacionar em X (pivot está na base)
+    glRotatef(-15.0f, 1.0f, 0.0f, 0.0f);
+
+    // 3) desenhar o cubo deslocado para cima de modo que sua base coincida com o pivô
+    glTranslatef(0.0f, backHeight * 0.5f, 0.0f);
+
+    // 4) escala do encosto
+    glScalef(seatWidth, backHeight, backDepth);
+    glutSolidCube(1.0f);
+    glPopMatrix();
+
+    // --- Pernas ---
+    float legH = 0.5f;
+    float legX = seatWidth * 0.4f; // distância lateral das pernas
+    float legZ = seatDepth * 0.35f;
+
+    // Frente esquerda
+    glPushMatrix();
+    glTranslatef(-legX, legH * 0.5f, legZ);
+    glScalef(0.2f, legH, 0.2f);
+    glutSolidCube(1.0f);
+    glPopMatrix();
+
+    // Frente direita
+    glPushMatrix();
+    glTranslatef(legX, legH * 0.5f, legZ);
+    glScalef(0.2f, legH, 0.2f);
+    glutSolidCube(1.0f);
+    glPopMatrix();
+
+    // Trás esquerda
+    glPushMatrix();
+    glTranslatef(-legX, legH * 0.5f, -legZ);
+    glScalef(0.2f, legH, 0.2f);
+    glutSolidCube(1.0f);
+    glPopMatrix();
+
+    // Trás direita
+    glPushMatrix();
+    glTranslatef(legX, legH * 0.5f, -legZ);
+    glScalef(0.2f, legH, 0.2f);
+    glutSolidCube(1.0f);
+    glPopMatrix();
+
+    glPopMatrix();
+}
+
+
+void drawAllBenchesDetailed() {
+
+    // --- Caminho horizontal (esquerda-direita) ---
+    // lado de cima
+    drawBenchDetailed(-12, 0, -6, 0);
+    drawBenchDetailed(12, 0, -6, 0);
+    drawBenchDetailed(-24, 0, -6, 0);
+    drawBenchDetailed(24, 0, -6, 0);
+
+    // lado de baixo
+    drawBenchDetailed(-12, 0, 6, 180);
+    drawBenchDetailed(12, 0, 6, 180);
+    drawBenchDetailed(-24, 0, 6, 180);
+    drawBenchDetailed(24, 0, 6, 180);
+
+    // --- Caminho vertical (cima-baixo) ---
+    // lado esquerdo
+    drawBenchDetailed(-6, 0, -12, 90);
+    drawBenchDetailed(-6, 0, 12, 90);
+    drawBenchDetailed(-6, 0, -24, 90);
+    drawBenchDetailed(-6, 0, 24, 90);
+
+    // lado direito
+    drawBenchDetailed(6, 0, -12, -90);
+    drawBenchDetailed(6, 0, 12, -90);
+    drawBenchDetailed(6, 0, -24, -90);
+    drawBenchDetailed(6, 0, 24, -90);
+}
+
+void drawPlaza() {
+    drawGrass();
+    drawPaths();
+    drawRoundabout();
+    drawAllBenchesDetailed();
+    drawVegetation();
+}
 
 
 //teclado
@@ -144,10 +649,360 @@ void processMovement() {
     }
 }
 
+void drawFront() {
+    //chão 1 segundo andar
+    drawFloor(300, 60, 0, 15, -35, 0.5f, 0.5f, 0.5f);
+    //chão 2 segundo andar
+    drawFloor(300, 60, 0, 30, -35, 1, 1, 0.85);
+
+    //parede grande esquerda a porta
+    drawBox(140,30,1,-80,15,-5,1,1,0.85); 	
+    //parede grande direita a porta
+    drawBox(140,30,1,80,15,-5,1,1,0.85);
+
+    //parede 1 meio
+    drawBox(140,30,1,80,15,-45,1,1,0.85);
+    //parede 2 meio
+    drawBox(140,30,1,-80,15,-45,1,1,0.85); 
+
+    //parede acima pilar meio 1
+    drawBox(140,5,1,-80,15,-65,1,1,0.85); 	
+    //parede acima pilar meio 2
+    drawBox(140,5,1,80,15,-65,1,1,0.85);
+    //parede acima pilar meio 3
+    drawBox(20,5,1,0,15,-65,1,1,0.85);
+    
+
+    //Frame da porta de entrada meio 1
+	drawDoorFrame(20,7,1,0,0,-45,0);
+    //Frame da porta de entrada meio 2
+	drawDoorFrame(20,7,1,0,15,-45,0);
+
+    //parede acima da porta do meio 1
+    drawBox(20,8,1,0,26,-45,1,1,0.85); 
+
+    //parede acima da porta do meio 2
+    drawBox(20,8,1,0,11,-45,1,1,0.85);
+
+    //pilar 1 meio
+    drawPillar(2, 30, -10, 0, -65, 1, 1, 0.85);
+    //pilar 2 meio
+    drawPillar(2, 30, 10, 0, -65, 1, 1, 0.85);
+    //pilar 3 meio
+    drawPillar(2, 30, -30, 0, -65, 1, 1, 0.85);
+    //pilar 4 meio
+    drawPillar(2, 30, 30, 0, -65, 1, 1, 0.85);
+    //pilar 5 meio
+    drawPillar(2, 30, -50, 0, -65, 1, 1, 0.85);
+    //pilar 6 meio
+    drawPillar(2, 30, 50, 0, -65, 1, 1, 0.85);
+    //pilar 7 meio
+    drawPillar(2, 30, -70, 0, -65, 1, 1, 0.85);
+    //pilar 8 meio
+    drawPillar(2, 30, 70, 0, -65, 1, 1, 0.85);
+    //pilar 9 meio
+    drawPillar(2, 30, -90, 0, -65, 1, 1, 0.85);
+    //pilar 10 meio
+    drawPillar(2, 30, 90, 0, -65, 1, 1, 0.85);
+    //pilar 11 meio
+    drawPillar(2, 30, -110, 0, -65, 1, 1, 0.85);
+    //pilar 12 meio
+    drawPillar(2, 30, 110, 0, -65, 1, 1, 0.85);
+    //pilar 13 meio
+    drawPillar(2, 30, -130, 0, -65, 1, 1, 0.85);
+    //pilar 14 meio
+    drawPillar(2, 30, 130, 0, -65, 1, 1, 0.85);
+    //pilar 15 meio
+    drawPillar(2, 30, -145, 0, -65, 1, 1, 0.85);
+    //pilar 16 meio
+    drawPillar(2, 30, 145, 0, -65, 1, 1, 0.85);
+
+    //janelas Frente
+    //janelas direitas
+    drawWindowFrame(15, 8, 0.5f, 50, 12.5, -4, 0);
+    drawWindowFrame(15, 8, 0.5f, 50, 25, -4, 0);
+    drawWindowFrame(15, 8, 0.5f, 70, 12.5, -4, 0);
+    drawWindowFrame(15, 8, 0.5f, 70, 25, -4, 0);
+    drawWindowFrame(15, 8, 0.5f, 90, 12.5, -4, 0);
+    drawWindowFrame(15, 8, 0.5f, 90, 25, -4, 0);
+    drawWindowFrame(15, 8, 0.5f, 110, 12.5, -4, 0);
+    drawWindowFrame(15, 8, 0.5f, 110, 25, -4, 0);
+    drawWindowFrame(15, 8, 0.5f, 130, 12.5, -4, 0);
+    drawWindowFrame(15, 8, 0.5f, 130, 25, -4, 0);
+
+    //janelas esquerdas
+    drawWindowFrame(15, 8, 0.5f, -50, 12.5, -4, 0);
+    drawWindowFrame(15, 8, 0.5f, -50, 25, -4, 0);
+    drawWindowFrame(15, 8, 0.5f, -70, 12.5, -4, 0);
+    drawWindowFrame(15, 8, 0.5f, -70, 25, -4, 0);
+    drawWindowFrame(15, 8, 0.5f, -90, 12.5, -4, 0);
+    drawWindowFrame(15, 8, 0.5f, -90, 25, -4, 0);
+    drawWindowFrame(15, 8, 0.5f, -110, 12.5, -4, 0);
+    drawWindowFrame(15, 8, 0.5f, -110, 25, -4, 0);
+    drawWindowFrame(15, 8, 0.5f, -130, 12.5, -4, 0);
+    drawWindowFrame(15, 8, 0.5f, -130, 25, -4, 0);
+
+    //janelas direita meio
+    drawWindowFrame(15, 8, 0.5f, 30, 12.5, -46, 0);
+    drawWindowFrame(15, 8, 0.5f, 30, 25, -46, 0);
+    drawWindowFrame(15, 8, 0.5f, 50, 12.5, -46, 0);
+    drawWindowFrame(15, 8, 0.5f, 50, 25, -46, 0);
+    drawWindowFrame(15, 8, 0.5f, 70, 12.5, -46, 0);
+    drawWindowFrame(15, 8, 0.5f, 70, 25, -46, 0);
+    drawWindowFrame(15, 8, 0.5f, 90, 12.5, -46, 0);
+    drawWindowFrame(15, 8, 0.5f, 90, 25, -46, 0);
+    drawWindowFrame(15, 8, 0.5f, 110, 12.5, -46, 0);
+    drawWindowFrame(15, 8, 0.5f, 110, 25, -46, 0);
+    drawWindowFrame(15, 8, 0.5f, 130, 12.5, -46, 0);
+    drawWindowFrame(15, 8, 0.5f, 130, 25, -46, 0);
+
+    //janelas esquerda meio
+    drawWindowFrame(15, 8, 0.5f, -30, 12.5, -46, 0);
+    drawWindowFrame(15, 8, 0.5f, -30, 25, -46, 0);
+    drawWindowFrame(15, 8, 0.5f, -50, 12.5, -46, 0);
+    drawWindowFrame(15, 8, 0.5f, -50, 25, -46, 0);
+    drawWindowFrame(15, 8, 0.5f, -70, 12.5, -46, 0);
+    drawWindowFrame(15, 8, 0.5f, -70, 25, -46, 0);
+    drawWindowFrame(15, 8, 0.5f, -90, 12.5, -46, 0);
+    drawWindowFrame(15, 8, 0.5f, -90, 25, -46, 0);
+    drawWindowFrame(15, 8, 0.5f, -110, 12.5, -46, 0);
+    drawWindowFrame(15, 8, 0.5f, -110, 25, -46, 0);
+    drawWindowFrame(15, 8, 0.5f, -130, 12.5, -46, 0);
+    drawWindowFrame(15, 8, 0.5f, -130, 25, -46, 0);
+
+    //Lado Direito
+    //Salas Repartição
+    //Parede a direita grande repartição
+    drawBox(140,30,1,80,15,-20,1,1,0.85);
+
+    //Parede a direita que fecha a repartição
+    drawBox(1,30,15,10,15,-13,1,1,0.85);
+
+    //portas a direita da entrada
+    drawClosedDoor(5,10,1,30,0,-20.5,180);
+    drawClosedDoor(5,10,1,60,0,-20.5,180);
+    drawClosedDoor(5,10,1,90,0,-20.5,180);
+
+    //Lado Esquerdo
+    //Salas Repartição
+    //Parede a esquerda grande repartição
+    drawBox(140,30,1,-80,15,-20,1,1,0.85);
+
+    //Parede a esquerda que fecha a repartição
+    drawBox(1,30,15,-10,15,-13,1,1,0.85);
+
+    //portas a esquerda da entrada
+    drawClosedDoor(5,10,1,-30,0,-20.5,180);
+    drawClosedDoor(5,10,1,-60,0,-20.5,180);
+    drawClosedDoor(5,10,1,-90,0,-20.5,180);
+
+    //Lado Direito em cima
+    //Salas Repartição
+    //portas a direita da entrada
+    drawClosedDoor(5,10,1,30,15,-20.5,180);
+    drawClosedDoor(5,10,1,60,15,-20.5,180);
+    drawClosedDoor(5,10,1,90,15,-20.5,180);
+
+    //Lado Esquerdo
+    //Salas Repartição
+    //portas a esquerda da entrada
+    drawClosedDoor(5,10,1,-30,15,-20.5,180);
+    drawClosedDoor(5,10,1,-60,15,-20.5,180);
+    drawClosedDoor(5,10,1,-90,15,-20.5,180);
+}
+
 void drawScene() {
-    drawWall(15, 3, 0.2, 0, 0, -5);
-	drawPillar(0.3, 4, 3, 0, 2);
-	drawWindow(2, 1.5, 0.1, -2, 1.5, -5);
+    drawFront();
+    // Segunda chamada rotacionada em 90 graus em Y e deslocada
+    glPushMatrix();
+    glRotatef(90.0f, 0.0f, 1.0f, 0.0f);
+    // Translação aplicada após a rotação (ajusta no sistema local rotacionado)
+    glTranslatef(200.0f, 0.0f, 215.0f);
+    drawFront();
+    glPopMatrix();
+
+    // Terceira chamada rotacionada em 180 graus em Y e deslocada
+    glPushMatrix();
+    glRotatef(180.0f, 0.0f, 1.0f, 0.0f);
+    // Translação aplicada após a rotação (ajusta no sistema local rotacionado)
+    glTranslatef(0.0f, 0.0f, 415.0f);
+    drawFront();
+    glPopMatrix();
+
+	//entrada
+    drawFloor(800, 800, 0, 0, 0, 0.5f, 0.5f, 0.5f);
+    //pilar 1 entrada
+    drawPillar(2, 30, -10, 0, 25, 1, 1, 0.85);
+    //pilar 2 entrada
+    drawPillar(2, 30, 10, 0, 25, 1, 1, 0.85);
+    //pilar 3 entrada
+    drawPillar(2, 30, -30, 0, 25, 1, 1, 0.85);
+    //pilar 4 entrada
+    drawPillar(2, 30, 30, 0, 25, 1, 1, 0.85);
+
+    //parede acima pilar meio 4
+    drawBox(60,5,1,-180,15,-65,1,1,0.85); 	
+    //parede acima pilar meio 5
+    drawBox(1,5,20,-210,15,-55,1,1,0.85); 	
+
+    //chão 3 segundo andar
+    drawFloor(60, 75, -180, 30, -27.5, 1, 1, 0.85);
+    //chão 4 segundo andar
+    drawFloor(60, 75, -180, 15, -27.5, 0.5f, 0.5f, 0.5f);
+    
+    //varanda entre os pilares
+    drawFloor(60, 40, 0, 15, 5, 0.5f, 0.5f, 0.5f);
+    //Telhado acima dos pilares
+    drawFloor(60, 40, 0, 30, 5, 1, 1, 0.85);
+
+    //paredes da entrada (y = wallHeight/2 = 15)
+    //parede esquerda porta
+    drawBox(10,30,1,-10,15,0,1,1,0.85);
+    //parede direita porta
+    drawBox(10,30,1,10,15,0,1,1,0.85); 
+    //parede esquerda perpendicular a porta	
+    drawBox(1,30,5,-15,15,-2.5,1,0.85,0.85);
+    //parede direita perpendicular a porta
+    drawBox(1,30,5,15,15,-2.5,1,0.85,0.85);
+
+    //parede varanda entrada
+    drawBox(60,8,1,0,15,25,1,1,0.85);
+    //parede varanda entrada
+    drawBox(1,8,30,30,15,10,1,1,0.85);
+    //parede varanda entrada
+    drawBox(1,8,30,-30,15,10,1,1,0.85);
+
+    //parede 1 direita quadrado
+    drawBox(1,30,30,150,15,-5,1,1,0.85);
+    //parede 2 direita quadrado
+    drawBox(60,30,1,180,15,10,1,1,0.85);
+    //parede 3 direita quadrado
+    drawBox(1,30,200,210,15,-90,1,1,0.85);
+
+    //parede 1 esquerda quadrado
+    drawBox(1,30,30,-150,15,-5,1,1,0.85);
+    //parede 2 esquerda quadrado
+    drawBox(60,30,1,-180,15,10,1,1,0.85);
+    //parede 3 esquerda quadrado
+    drawBox(1,30,55,-210,15,-17.5,1,1,0.85);	
+
+
+    //parede acima da porta de entrada
+    drawBox(10,8,1,0,11,0,1,1,0.85); 
+
+    //parede acima da porta da varanda
+    drawBox(10,8,1,0,26,0,1,1,0.85); 
+ 
+    //parede esquerda meio
+    drawBox(60,30,1,-180,15,-45,1,1,0.85);
+
+
+    //Frame da porta de entrada
+	drawDoorFrame(10,7,1,0,0,0,0);
+    //Frame da porta da varanda
+	drawDoorFrame(10,7,1,0,15,0,0);
+	
+    //Telhado da frente perpendicular
+    drawRoof(70, 300, 10, 0, 30, -30, 90, 0.6f, 0.2f, 0.0f);
+    //Telhado da frente
+    drawRoof(60, 55, 10, 0, 30, -2.5, 0, 0.6f, 0.2f, 0.0f);
+    //Telhado direito 
+    drawRoof(60, 360, 10, 180, 30, -170, 0, 0.6f, 0.2f, 0.0f);
+    //Telhado esquerdo
+    drawRoof(60, 75, 10, -180, 30, -27.5, 0, 0.6f, 0.2f, 0.0f);
+    //Telhado traseiro
+    drawRoof(60, 360, 10, 30, 30, -380, 90, 0.6f, 0.2f, 0.0f);
+    
+
+    //pilar 17 meio
+    drawPillar(2, 30, -160, 0, -65, 1, 1, 0.85);
+    //pilar 18 meio
+    drawPillar(2, 30, -175, 0, -65, 1, 1, 0.85);
+    //pilar 19 meio
+    drawPillar(2, 30, -190, 0, -65, 1, 1, 0.85);
+    //pilar 20 meio
+    drawPillar(2, 30, -205, 0, -65, 1, 1, 0.85);
+    
+    //Auditorio A
+    //Primeira passagem
+     //Paredezinha
+    drawBox(1,15,10,150,7.5,-25,1,1,0.85);
+    drawDoorFrame(14,12,1,150,0,-37,90);
+    drawBox(1,2.8,14,150,13.5,-37,1,1,0.85);
+
+
+
+    //Segunda passagem
+    //Delimitação Auditorio Parede
+    drawBox(1,15,30,180,7.5,-5,1,1,0.85);
+    drawBox(1,3,15,180,13.3,-27.5,1,1,0.85);
+    drawDoorFrame(14.2,12,1,180,0,-27.5,90);
+    drawClosedDoor(7,12,1,180,0,-31.5,270);
+    drawClosedDoor(7,12,1,183,0,-21.5,25);
+    drawBox(1,15,15,180,7.5,-42.5,1,1,0.85);
+
+    //Saída Auditorio
+    
+    
+    
+
+    //Porta aberta saida auditorio
+    drawBox(7.5,15,1,154,7.5,-45,1,1,0.85);
+    drawBox(14.5,4.5,1,165,12.5,-45,1,1,0.85);
+    drawDoorFrame(14.5,10,1,165,0,-45,0);
+    drawClosedDoor(6.5,10,1,169,0,-45,180);
+    drawClosedDoor(7.5,10,1,158.5,0,-48.5,90);
+
+    drawBox(7.5,15,1,176.2,7.5,-45,1,1,0.85);
+    
+    //cadeira perto audi A
+    drawChair(165,0,-5,5,180);
+    drawTable(165,0,-12,5);
+    drawTable(159,0,-12,5);
+    drawTable(171,0,-12,5);
+
+    //Fechamento auditório
+    drawBox(30,15,1,195,7.5,-45,1,1,0.85);
+
+    //Preenchendo o aduitorio
+    drawChair(185,0,-5,5,180);
+    drawChair(188,0,-5,5,180);
+    drawChair(191,0,-5,5,180);
+    drawChair(194,0,-5,5,180);
+    drawChair(197,0,-5,5,180);
+    drawChair(200,0,-5,5,180);
+    drawChair(203,0,-5,5,180);
+    drawChair(206,0,-5,5,180);
+
+    drawChair(185,0,4,5,180);
+    drawChair(188,0,4,5,180);
+    drawChair(191,0,4,5,180);
+    drawChair(194,0,4,5,180);
+    drawChair(197,0,4,5,180);
+    drawChair(200,0,4,5,180);
+    drawChair(203,0,4,5,180);
+    drawChair(206,0,4,5,180);
+
+    drawChair(185,0,-14,5,180);
+    drawChair(188,0,-14,5,180);
+    drawChair(191,0,-14,5,180);
+    drawChair(194,0,-14,5,180);
+    drawChair(197,0,-14,5,180);
+    drawChair(200,0,-14,5,180);
+    drawChair(203,0,-14,5,180);
+    drawChair(206,0,-14,5,180);
+
+    drawChair(185,0,-19,5,180);
+    drawChair(188,0,-19,5,180);
+    drawChair(191,0,-19,5,180);
+    drawChair(194,0,-19,5,180);
+    drawChair(197,0,-19,5,180);
+    drawChair(200,0,-19,5,180);
+    drawChair(203,0,-19,5,180);
+    drawChair(206,0,-19,5,180);
+
+    //Telão
+    drawBox(13,8,1,195,10,-44,0.8,0.8,0.8);
 }
 
 void display() {
@@ -160,7 +1015,11 @@ void display() {
               0, 1, 0);
 
     drawScene();
-
+    glPushMatrix();
+    glTranslatef(0, 0.2f, -205);
+    glScalef(3, 2.5, 2.8);
+	drawPlaza();
+	glPopMatrix();
     glutSwapBuffers();
 }
 
@@ -213,13 +1072,15 @@ void reshape(int w, int h) {
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(60.0, (float)w / h, 0.1, 200.0);
+    // Aumenta o far plane para 5000.0f para expandir o alcance de renderização
+    // e ajusta o near para 0.5f para preservar precisão de profundidade
+    gluPerspective(60.0, (float)w / h, 0.5, 5000.0);
 
     glMatrixMode(GL_MODELVIEW);
 }
 
 void init() {
-    glClearColor(0.1, 0.1, 0.1, 1);
+    glClearColor(0.529f, 0.808f, 0.922f, 1.0f);
     glEnable(GL_DEPTH_TEST);
 
     updateCameraDirection();
@@ -249,4 +1110,5 @@ int main(int argc, char** argv) {
     glutMainLoop();
     return 0;
 }
+
 
